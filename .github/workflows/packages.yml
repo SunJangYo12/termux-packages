@@ -11,6 +11,7 @@ on:
     - 'root-packages/**'
     - 'x11-packages/**'
   pull_request:
+    branches: [jin-origin/ubuntu-26.04]
     paths:
     - 'packages/**'
     - 'root-packages/**'
