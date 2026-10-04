@@ -3,7 +3,7 @@ name: Packages
 on:
   push:
     branches:
-    - master
+    - jin-origin/ubuntu-26.04
     - dev
     - 'dev/**'
     paths:
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-26.04
     strategy:
       matrix:
-        target_arch: [aarch64, arm, i686, x86_64]
+        target_arch: [aarch64]
       fail-fast: false
     steps:
     - name: Clone repository
