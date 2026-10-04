@@ -1,7 +1,11 @@
 name: Build OpenSSH
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [jin-bootstrap-2021.02.11-r1]
+  pull_request:
+    branches: [jin-bootstrap-2021.02.11-r1]
+
 
 jobs:
   build:
