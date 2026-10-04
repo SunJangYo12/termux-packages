@@ -1,0 +1,62 @@
+name: Build OpenSSH
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            curl \
+            git \
+            gnupg \
+            jq \
+            lzip \
+            tar \
+            unzip \
+            xz-utils \
+            autoconf \
+            automake \
+            autopoint \
+            bison \
+            flex \
+            g++ \
+            gawk \
+            gettext \
+            gperf \
+            libglib2.0-dev \
+            libtool-bin \
+            libltdl-dev \
+            m4 \
+            pkg-config \
+            openssl \
+            libssl-dev \
+            zlib1g-dev \
+            libedit-dev
+
+      - name: Setup Android SDK and NDK
+        run: |
+          ./scripts/setup-android-sdk.sh
+
+      - name: Build OpenSSH
+        run: |
+          ./build-package.sh -a aarch64 -i openssh
+
+      - name: Show packages
+        run: |
+          find debs -maxdepth 1 -type f -name '*.deb' -printf '%f\n'
+          ls -lh debs/
+
+      - name: Upload OpenSSH package
+        uses: actions/upload-artifact@v4
+        with:
+          name: openssh-aarch64
+          path: debs/*openssh*.deb
