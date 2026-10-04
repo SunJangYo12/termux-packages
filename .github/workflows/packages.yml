@@ -104,6 +104,17 @@ jobs:
             exit 0
           fi
 
+          # A subpackage goes to the repository named by TERMUX_SUBPKG_REPO
+          # (x11 or root), or to the repository of its parent package.
+          subpkg_repo_name() {
+            local target
+            target=$(sed -nE 's/^TERMUX_SUBPKG_REPO="?([^"]*)"?$/\1/p' "$1")
+            case "$target" in
+              x11|root) echo "termux-$target" ;;
+              *) echo "$2" ;;
+            esac
+          }
+
           for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
             repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
             # Parse changed files and identify new packages and deleted packages.
@@ -129,7 +140,7 @@ jobs:
                   # If there are subpackages we want to create a list of those
                   # as well
                   for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_$(subpkg_repo_name "$file" "$repo")_subpackages.txt
                   done
                 else
                   echo "$pkg" >> ./deleted_${repo}_packages
@@ -150,7 +161,7 @@ jobs:
                 found=true
                 echo "$pkg" >> ./built_${repo}_packages.txt
                 for subpkg in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_$(subpkg_repo_name "$subpkg" "$repo")_subpackages.txt
                 done
               fi
             done
